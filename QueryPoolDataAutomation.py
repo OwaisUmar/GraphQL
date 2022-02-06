@@ -85,12 +85,28 @@ columns = ['ID', 'Date', 'Token1', 'Token2', 'Pair', 'Liquidity', 'sqrtPrice',
 
 # connecting to MySQL database:
 mydb = mysql.connector.connect(
-    # host='127.0.0.1',
+    host='127.0.0.1',
     user='root',
     password='owais',
-    # port='3306',
+    port='3306'
+)
+
+mycur = mydb.cursor()
+mycur.execute('drop database if exists trading_db')
+mycur.execute('create database trading_db')
+mycur.close()
+print('Database created successfully')
+
+mydb = mysql.connector.connect(
+    host='127.0.0.1',
+    user='root',
+    password='owais',
+    port='3306',
     database='trading_db'
 )
+
+mycur = mydb.cursor()
+mycur.execute('drop table if exists pool_data')
 
 create = 'create table pool_data (\n'  # Query string to create table
 for col in columns:
@@ -101,12 +117,12 @@ for col in columns:
         create += 'varchar(255),\n'
 create = create + 'PRIMARY KEY (ID)\n)'
 
-mycur = mydb.cursor()
 mycur.execute(create)     # query to create table
-
+print('Table created successfully')
 
 insertDataQueries = ["insert into pool_data values('" + "', '".join(x) + "')" for x in pairs]
 for insertQuery in insertDataQueries:
     mycur.execute(insertQuery)
     mydb.commit()
 
+print('Data inserted successfully')
